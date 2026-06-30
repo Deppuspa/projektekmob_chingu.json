@@ -5,6 +5,8 @@ import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/google_button.dart';
 import 'register_screen.dart';
+import '../services/api_service.dart';
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +19,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+
+  final ApiService apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +129,53 @@ const SizedBox(height: 28),
 
 CustomButton(
   text: "Masuk",
-  onPressed: () {},
+  onPressed: () async {
+        if (emailController.text.trim().isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+          content: Text("Email tidak boleh kosong"),
+        ),
+      );
+      return;
+    }
+
+    if (passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password tidak boleh kosong"),
+        ),
+      );
+      return;
+    }
+    final users = await apiService.getUsers();
+
+    final user = users.cast<Map<String, dynamic>>().firstWhere(
+      (user) =>
+      user["email"] == emailController.text.trim() &&
+      user["password"] == passwordController.text.trim(),
+      orElse: () => {},
+    );
+    if (user.isNotEmpty) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login berhasil"),
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+        builder: (context) => const MainScreen(),
+      ),
+    );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+        content: Text("Email atau password salah"),
+      ),
+    );
+  }
+  },
 ),
 
 const SizedBox(height: 28),

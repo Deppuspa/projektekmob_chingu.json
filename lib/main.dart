@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 
 void main() {
@@ -11,12 +13,9 @@ class SaveBiteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'SaveBite',
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Inter',
-      ),
+      theme: AppTheme.theme,
+      debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
     );
   }

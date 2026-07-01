@@ -15,19 +15,25 @@ class _MapScreenState extends State<MapScreen> {
   bool _showDetail = true;
 
   final FoodItem _selectedItem = FoodItem(
-    id: 'map1',
-    name: 'Sushi Mix Tray',
-    restaurantName: 'Sakura Sushi Bar',
-    imageUrl:
-        'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600',
-    originalPrice: 89000,
-    discountedPrice: 35000,
-    distanceKm: 1.2,
-    pickupTimeStart: '20:30',
-    pickupTimeEnd: '21:30',
-    remainingCount: 2,
-    rating: 4.8,
-  );
+  id: 'map1',
+  name: 'Sushi Mix Tray',
+  restaurantName: 'Sakura Sushi Bar',
+  imageUrl:
+      'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600',
+
+  description: 'Paket sushi surplus food yang masih layak konsumsi.',
+  category: 'Makanan Berat',
+  latitude: -7.7956,
+  longitude: 110.3695,
+
+  originalPrice: 89000,
+  discountedPrice: 35000,
+  distanceKm: 1.2,
+  pickupTimeStart: '20:30',
+  pickupTimeEnd: '21:30',
+  remainingCount: 2,
+  rating: 4.8,
+);
 
   @override
   Widget build(BuildContext context) {

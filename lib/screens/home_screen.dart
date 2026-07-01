@@ -7,97 +7,66 @@ import '../widgets/category_chip.dart';
 import '../widgets/food_card_home.dart';
 import '../widgets/section_header.dart';
 import 'checkout_screen.dart';
+import '../services/api_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-  static final List<FoodItem> _recommendations = [
-    FoodItem(
-      id: '1',
-      name: 'Green Garden Cafe',
-      restaurantName: 'Green Garden Cafe',
-      imageUrl:
-          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600',
-      originalPrice: 40000,
-      discountedPrice: 17000,
-      distanceKm: 0.8,
-      pickupTimeStart: '18:00',
-      pickupTimeEnd: '19:30',
-      remainingCount: 3,
-      tag: 'PILIHAN VEGAN',
-    ),
-    FoodItem(
-      id: '2',
-      name: 'The Crusty Loaf',
-      restaurantName: 'The Crusty Loaf',
-      imageUrl:
-          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600',
-      originalPrice: 23000,
-      discountedPrice: 8000,
-      distanceKm: 1.2,
-      pickupTimeStart: '17:30',
-      pickupTimeEnd: '19:00',
-      remainingCount: 5,
-      tag: 'RAMAH LINGKUNGAN',
-    ),
-    FoodItem(
-      id: '3',
-      name: 'Sushi Zen',
-      restaurantName: 'Sushi Zen',
-      imageUrl:
-          'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600',
-      originalPrice: 89000,
-      discountedPrice: 35000,
-      distanceKm: 2.5,
-      pickupTimeStart: '20:00',
-      pickupTimeEnd: '21:00',
-      remainingCount: 1,
-      tag: 'HAMPIR HABIS',
-    ),
-    FoodItem(
-      id: '4',
-      name: 'Kedai Nasi Padang Berkah',
-      restaurantName: 'Kedai Nasi Padang Berkah',
-      imageUrl:
-          'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600',
-      originalPrice: 24000,
-      discountedPrice: 10000,
-      distanceKm: 0.5,
-      pickupTimeStart: '17:00',
-      pickupTimeEnd: '19:30',
-      remainingCount: 4,
-      tag: 'DISELAMATKAN HARI INI',
-    ),
-    FoodItem(
-      id: '5',
-      name: 'Snack Box SuperMarket',
-      restaurantName: 'Snack Box SuperMarket',
-      imageUrl:
-          'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600',
-      originalPrice: 26000,
-      discountedPrice: 12000,
-      distanceKm: 1.0,
-      pickupTimeStart: '18:30',
-      pickupTimeEnd: '20:00',
-      remainingCount: 6,
-      tag: 'DISELAMATKAN HARI INI',
-    ),
-  ];
+class _HomeScreenState extends State<HomeScreen> {
+
+  final ApiService _apiService = ApiService();
 
   static final List<Map<String, dynamic>> _categories = [
-    {'label': 'Makanan Berat', 'icon': Icons.restaurant},
-    {'label': 'Cemilan', 'icon': Icons.cookie_outlined},
-    {'label': 'Roti & Kue', 'icon': Icons.bakery_dining},
-    {'label': 'Sayuran', 'icon': Icons.eco_outlined},
-    {'label': 'Minuman', 'icon': Icons.local_drink_outlined},
-  ];
+  {'label': 'Makanan Berat', 'icon': Icons.restaurant},
+  {'label': 'Cemilan', 'icon': Icons.cookie_outlined},
+  {'label': 'Roti & Kue', 'icon': Icons.bakery_dining},
+  {'label': 'Sayuran', 'icon': Icons.eco_outlined},
+  {'label': 'Minuman', 'icon': Icons.local_drink_outlined},
+];
+
+  List<FoodItem> _recommendations = [];
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+  super.initState();
+  loadFoods();
+}
+Future<void> loadFoods() async {
+   try {
+    final data = await _apiService.getFoods();
+
+    setState(() {
+      _recommendations = data
+      .map((e) => FoodItem.fromJson(e))
+      .take(5)
+      .toList();
+
+      isLoading = false;
+    });
+  } catch (e) {
+    print(e);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: CustomScrollView(
+        child: isLoading
+        ? const Center(
+          child: CircularProgressIndicator(),
+        )
+        :CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Padding(

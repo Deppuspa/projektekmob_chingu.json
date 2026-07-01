@@ -4,74 +4,61 @@ import '../models/food_item.dart';
 import '../theme/app_theme.dart';
 import '../widgets/food_card_list.dart';
 import 'checkout_screen.dart';
+import '../services/api_service.dart';
 
-class FoodListScreen extends StatelessWidget {
+class FoodListScreen extends StatefulWidget {
   const FoodListScreen({super.key});
 
-  static final List<FoodItem> _items = [
-    FoodItem(
-      id: '1',
-      name: 'Aneka Pastri Sore',
-      restaurantName: 'Fullsun Bakery',
-      imageUrl:
-          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600',
-      originalPrice: 35000,
-      discountedPrice: 15000,
-      distanceKm: 1.2,
-      pickupTimeStart: '17:00',
-      pickupTimeEnd: '19:00',
-      remainingCount: 5,
-      tag: 'HAMPIR HABIS',
-    ),
-    FoodItem(
-      id: '2',
-      name: 'Sushi Set',
-      restaurantName: 'Sushi Yeay',
-      imageUrl:
-          'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600',
-      originalPrice: 75000,
-      discountedPrice: 32000,
-      distanceKm: 0.8,
-      pickupTimeStart: '18:00',
-      pickupTimeEnd: '20:00',
-      remainingCount: 12,
-      isNew: true,
-    ),
-    FoodItem(
-      id: '3',
-      name: 'Rice Bowl Hemat',
-      restaurantName: 'Kobessah',
-      imageUrl:
-          'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600',
-      originalPrice: 45000,
-      discountedPrice: 12000,
-      distanceKm: 2.5,
-      pickupTimeStart: '17:00',
-      pickupTimeEnd: '19:00',
-      remainingCount: 3,
-    ),
-    FoodItem(
-      id: '4',
-      name: 'Fresh Salad',
-      restaurantName: 'Green Bites Cafe',
-      imageUrl:
-          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600',
-      originalPrice: 28000,
-      discountedPrice: 9000,
-      distanceKm: 3.1,
-      pickupTimeStart: '18:00',
-      pickupTimeEnd: '20:00',
-      remainingCount: 2,
-      tag: 'HAMPIR HABIS',
-    ),
-  ];
+  @override
+  State<FoodListScreen> createState() => _FoodListScreenState();
+}
+  class _FoodListScreenState extends State<FoodListScreen> {
+
+  final ApiService _apiService = ApiService();
+  List<FoodItem> _items = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadFoods();
+}
+   Future<void> loadFoods() async {
+    try {
+      final data = await _apiService.getFoods();
+
+      setState(() {
+        _items = data
+            .map((e) => FoodItem.fromJson(e))
+            .toList();
+
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: CustomScrollView(
+        child: isLoading
+        ? const Center (
+            child: CircularProgressIndicator(),
+        )
+        : _items.isEmpty
+        ? const Center(
+          child: Text("Belum ada makanan tersedia"),
+
+        )
+        :CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -141,7 +128,6 @@ class FoodListScreen extends StatelessWidget {
         ),
         Row(
           children: [
-            // TODO: Tambahkan asset sesuai desain (avatar user)
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.primary.withOpacity(0.2),

@@ -18,24 +18,51 @@ class _OrdersScreenState extends State<OrdersScreen> {
     Order(
       id: '1',
       restaurantName: 'Warung Mama Sari',
+      restaurantAddress: 'Jl. Kaliurang No. 5',
       packageName: 'Paket Nasi Padang Surprise',
       pickupTimeStart: '17:30',
       pickupTimeEnd: '19:00',
       price: 15000,
       imageUrl:
           'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400',
-      isActive: true,
+      status: OrderStatus.menunggu,
+      pickupCode: 'SB-7741',
+      orderTime: 'Hari ini, 17.10',
+      distanceKm: 0.5,
     ),
     Order(
       id: '2',
       restaurantName: 'Roti Boulangerie',
+      restaurantAddress: 'Jl. Malioboro No. 12',
       packageName: 'Magic Bakery Box',
       pickupTimeStart: '18:00',
       pickupTimeEnd: '20:00',
       price: 22000,
       imageUrl:
           'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400',
-      isActive: true,
+      status: OrderStatus.menunggu,
+      pickupCode: 'SB-9023',
+      orderTime: 'Hari ini, 17.20',
+      distanceKm: 1.0,
+    ),
+  ];
+
+  static final List<Order> _completedOrders = [
+    Order(
+      id: '3',
+      restaurantName: 'Bakery Delice',
+      restaurantAddress: 'Jl. Sudirman No. 8',
+      packageName: 'Mystery Bag (Roti & Pastry)',
+      pickupTimeStart: '16:00',
+      pickupTimeEnd: '18:00',
+      price: 35000,
+      imageUrl:
+          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400',
+      status: OrderStatus.dibatalkan,
+      pickupCode: 'SB-4821',
+      orderTime: 'Kemarin, 15.45',
+      distanceKm: 1.2,
+      paymentMethod: 'E-wallet',
     ),
   ];
 
@@ -71,7 +98,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               Expanded(
                 child: _isActive
                     ? _buildActiveOrders()
-                    : _buildEmptyCompleted(),
+                    : _buildCompletedOrders(),
               ),
             ],
           ),
@@ -130,7 +157,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // ✅ FIX: Column diganti ListView agar tidak overflow
   Widget _buildActiveOrders() {
     return ListView(
       padding: EdgeInsets.zero,
@@ -138,6 +164,27 @@ class _OrdersScreenState extends State<OrdersScreen> {
         ..._activeOrders.map((o) => OrderCard(order: o)),
         const SizedBox(height: 16),
         _buildSavedCounter(),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildCompletedOrders() {
+    if (_completedOrders.isEmpty) {
+      return Center(
+        child: Text(
+          'Belum ada pesanan selesai',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      );
+    }
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        ..._completedOrders.map((o) => OrderCard(order: o)),
         const SizedBox(height: 8),
       ],
     );
@@ -174,32 +221,23 @@ class _OrdersScreenState extends State<OrdersScreen> {
             children: [
               Text(
                 'Setara dengan 7.2 kg CO',
-                style: GoogleFonts.inter(fontSize: 13, color: AppColors.green),
+                style:
+                    GoogleFonts.inter(fontSize: 13, color: AppColors.green),
               ),
               Text(
                 '₂',
-                style: GoogleFonts.inter(fontSize: 11, color: AppColors.green),
+                style:
+                    GoogleFonts.inter(fontSize: 11, color: AppColors.green),
               ),
               Text(
                 ' dihemat ',
-                style: GoogleFonts.inter(fontSize: 13, color: AppColors.green),
+                style:
+                    GoogleFonts.inter(fontSize: 13, color: AppColors.green),
               ),
               const Text('🌍', style: TextStyle(fontSize: 14)),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyCompleted() {
-    return Center(
-      child: Text(
-        'Belum ada pesanan selesai',
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          color: AppColors.textSecondary,
-        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import 'review_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -87,12 +88,21 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Row(
-            children: [
-              _StatItem(value: '14', label: 'PESANAN'),
-              const SizedBox(width: 10),
-              _StatItem(value: '7.2kg', label: 'CO₂ HEMAT'),
-              const SizedBox(width: 10),
-              _StatItem(value: 'Rp 420K', label: 'DIHEMAT'),
+            children: const [
+              _StatItem(
+                value: '14',
+                label: 'PESANAN',
+              ),
+              SizedBox(width: 10),
+              _StatItem(
+                value: '7.2kg',
+                label: 'CO₂ HEMAT',
+              ),
+              SizedBox(width: 10),
+              _StatItem(
+                value: 'Rp 420K',
+                label: 'DIHEMAT',
+              ),
             ],
           ),
         ],
@@ -115,28 +125,37 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           _MenuItem(
-            icon: Icons.favorite_border,
-            label: 'Favorit',
-            onTap: () {},
+            icon: Icons.star_border_rounded,
+            label: 'Ulasan Saya',
+            isFirst: true,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const MyReviewsScreen(),
+              ),
+            ),
           ),
-          _Divider(),
+          const _Divider(),
+
           _MenuItem(
             icon: Icons.credit_card_outlined,
             label: 'Metode Pembayaran',
             onTap: () {},
           ),
-          _Divider(),
+          const _Divider(),
+
           _MenuItem(
             icon: Icons.settings_outlined,
             label: 'Pengaturan',
             onTap: () {},
           ),
-          _Divider(),
+          const _Divider(),
+
           _MenuItem(
             icon: Icons.help_outline,
             label: 'Bantuan',
-            onTap: () {},
             isLast: true,
+            onTap: () {},
           ),
         ],
       ),
@@ -148,7 +167,11 @@ class ProfileScreen extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () {},
-        icon: const Icon(Icons.logout, color: AppColors.red, size: 18),
+        icon: const Icon(
+          Icons.logout,
+          color: AppColors.red,
+          size: 18,
+        ),
         label: Text(
           'Keluar',
           style: GoogleFonts.inter(
@@ -158,7 +181,10 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color(0xFFE0D6C8), width: 1.5),
+          side: const BorderSide(
+            color: Color(0xFFE0D6C8),
+            width: 1.5,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -174,7 +200,10 @@ class _StatItem extends StatelessWidget {
   final String value;
   final String label;
 
-  const _StatItem({required this.value, required this.label});
+  const _StatItem({
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -216,12 +245,14 @@ class _MenuItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final bool isFirst;
   final bool isLast;
 
   const _MenuItem({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.isFirst = false,
     this.isLast = false,
   });
 
@@ -229,21 +260,31 @@ class _MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: isLast
-          ? const BorderRadius.vertical(bottom: Radius.circular(16))
-          : BorderRadius.zero,
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(isFirst ? 16 : 0),
+        topRight: Radius.circular(isFirst ? 16 : 0),
+        bottomLeft: Radius.circular(isLast ? 16 : 0),
+        bottomRight: Radius.circular(isLast ? 16 : 0),
+      ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         child: Row(
           children: [
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF3E0),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFF3E0),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.primary, size: 20),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -256,8 +297,11 @@ class _MenuItem extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right,
-                color: AppColors.textSecondary, size: 20),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -266,6 +310,8 @@ class _MenuItem extends StatelessWidget {
 }
 
 class _Divider extends StatelessWidget {
+  const _Divider();
+
   @override
   Widget build(BuildContext context) {
     return Container(

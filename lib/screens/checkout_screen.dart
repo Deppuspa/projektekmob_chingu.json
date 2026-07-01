@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/food_item.dart';
 import '../theme/app_theme.dart';
+import '../models/order.dart';
+import 'order_success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final FoodItem item;
@@ -387,7 +389,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const SizedBox(height: 6),
         _PriceLine(
           label: 'Diskon Eco',
-          value: '${_fmt(discount.toInt())}',
+          value: _fmt(discount.toInt()),
           valueStyle: GoogleFonts.inter(
             fontSize: 14,
             color: AppColors.green,
@@ -424,7 +426,46 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            // Tentukan jam selesai pickup (1 slot setelah jam yang dipilih)
+            final selectedIndex = _times.indexOf(_selectedTime);
+            final endTime = selectedIndex + 1 < _times.length
+                ? _times[selectedIndex + 1]
+                : _selectedTime;
+
+            final newOrder = Order(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              restaurantName: widget.item.restaurantName,
+              restaurantAddress: 'Jl. Kusuma Jaya',
+              restaurantImageUrl: widget.item.imageUrl,
+              packageName: widget.item.name,
+              packageSubtitle: 'Premium Selection',
+              pickupTimeStart: _selectedTime,
+              pickupTimeEnd: endTime,
+              price: widget.item.discountedPrice * _quantity,
+              originalPrice: widget.item.originalPrice,
+              imageUrl: widget.item.imageUrl,
+              status: OrderStatus.menunggu,
+              pickupCode:
+                  'SB-${1000 + (DateTime.now().millisecondsSinceEpoch % 9000)}',
+              orderTime: 'Hari ini, ${TimeOfDay.now().format(context)}',
+              paymentMethod: _selectedPayment == 'ewallet'
+                  ? 'E-wallet'
+                  : _selectedPayment == 'bank'
+                      ? 'Transfer Bank'
+                      : 'Bayar di Tempat',
+              distanceKm: widget.item.distanceKm,
+              quantity: _quantity,
+              discountPercent: widget.item.discountPercent,
+            );
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => OrderSuccessScreen(order: newOrder),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
@@ -493,8 +534,7 @@ class _PaymentOption extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon,
-                color: AppColors.textSecondary, size: 20),
+            Icon(icon, color: AppColors.textSecondary, size: 20),
             const SizedBox(width: 12),
             Text(
               label,

@@ -9,6 +9,7 @@ import '../widgets/section_header.dart';
 import 'checkout_screen.dart';
 import '../services/api_service.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -28,6 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
 ];
 
   List<FoodItem> _recommendations = [];
+  List<FoodItem> _allFoods = [];
+  List<FoodItem> _filteredFoods = [];
+
+final TextEditingController _searchController =
+    TextEditingController();
 
   bool isLoading = true;
 
@@ -36,15 +42,35 @@ class _HomeScreenState extends State<HomeScreen> {
   super.initState();
   loadFoods();
 }
+
+void searchFoods(String keyword) {
+  setState(() {
+    if (keyword.isEmpty) {
+      _filteredFoods = List.from(_recommendations);
+    } else {
+      _filteredFoods = _allFoods.where((food) {
+        return food.name
+                .toLowerCase()
+                .contains(keyword.toLowerCase()) ||
+            food.restaurantName
+                .toLowerCase()
+                .contains(keyword.toLowerCase());
+      }).toList();
+    }
+  });
+}
+
 Future<void> loadFoods() async {
    try {
     final data = await _apiService.getFoods();
 
     setState(() {
-      _recommendations = data
+      _allFoods = data
       .map((e) => FoodItem.fromJson(e))
-      .take(5)
       .toList();
+
+      _recommendations = _allFoods.take(5).toList();
+      _filteredFoods = List.from(_recommendations);
 
       isLoading = false;
     });
@@ -93,16 +119,16 @@ Future<void> loadFoods() async {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => FoodCardHome(
-                    item: _recommendations[index],
+                    item: _filteredFoods[index],
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            CheckoutScreen(item: _recommendations[index]),
+                            CheckoutScreen(item: _filteredFoods[index]),
                       ),
                     ),
                   ),
-                  childCount: _recommendations.length,
+                  childCount: _filteredFoods.length,
                 ),
               ),
             ),
@@ -118,7 +144,6 @@ Future<void> loadFoods() async {
       children: [
         Row(
           children: [
-            // TODO: Tambahkan asset sesuai desain (avatar user)
             CircleAvatar(
               radius: 22,
               backgroundColor: AppColors.primary.withOpacity(0.2),
@@ -186,11 +211,23 @@ Future<void> loadFoods() async {
           const SizedBox(width: 16),
           const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
           const SizedBox(width: 8),
-          Text(
-            'Cari makanan atau restoran...',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: searchFoods,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Cari makanan atau restoran...',
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+                border: InputBorder.none,
+                isCollapsed: true,
+              ),
             ),
           ),
         ],
